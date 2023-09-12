@@ -3,7 +3,7 @@
 
 ## Dataset Preparation
 
-We gathered dataset of malaysian textsx and generate embedding using Open AI Embedding to mine high confidence negative and positive text pair for finetuning llama2 embedding model.
+We gathered dataset of malaysian texts and generate embedding using Open AI Embedding to mine high confidence negative and positive text pair for finetuning llama2 embedding model.
 
 Dataset: https://huggingface.co/datasets/mesolitica/OpenAI-embedding-ada-002
 
