@@ -34,7 +34,7 @@ Finetune replicates https://github.com/FlagOpen/FlagEmbedding finetune process.
 
 Train data is in a json file with the following format:
 
-```json
+```
 {"query": str, "pos": List[str], "neg":List[str]}
 ```
 
