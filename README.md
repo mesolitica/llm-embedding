@@ -1,32 +1,53 @@
 # llama2-embedding
 
+Finetune Malaysian Llama2 for embedding task.
 
 ## Dataset Preparation
 
-We gathered dataset of malaysian texts and generate embedding using Open AI Embedding to mine high confidence negative and positive text pair for finetuning llama2 embedding model.
+We gathered dataset of malaysian texts and generate embedding using various embedding models.
+
+### OpenAI ada-002
+
+Use Open AI Embedding to mine high confidence negative and positive text pair.
 
 Dataset: https://huggingface.co/datasets/mesolitica/OpenAI-embedding-ada-002
 
-Refer notebook [mining-facebook.ipynb](/home/ubuntu/embedding/mining) for example of text mining process to extract high confidence pair texts.
+Refer notebook [mining-openai/mining-facebook.ipynb](mining-openai/mining-facebook.ipynb) for example of text mining process to extract high confidence pair texts.
+
+### bge-large-en
+
+Use https://huggingface.co/BAAI/bge-large-en to mine high confidence negative and positive text pair.
+
+Dataset: https://huggingface.co/datasets/mesolitica/bge-large-en-embedding
+
+Refer notebook [mining-bge/mining-twitter.ipynb](mining-bge/mining-twitter.ipynb) for example of text mining process to extract high confidence pair texts.
+
+## Published Dataset
+
+We published paired dataset at https://huggingface.co/datasets/mesolitica/embedding-pair-mining
 
 ## Finetune
 
 Finetune replicates https://github.com/FlagOpen/FlagEmbedding finetune process.
 
-
-1. Train Data Format
+1. Train Data Format.
 
 Train data is in a json file with the following format:
-```
+
+```json
 {"query": str, "pos": List[str], "neg":List[str]}
 ```
+
 query is the query, and pos is a list of positive texts, neg is a list of negative texts.
 
-2. Pretrained Model
+2. Pretrained Model.
 
-We used llama2 pretrained model from https://huggingface.co/mesolitica/llama-7b-hf-16384-fpf and only select top 4 hidden layers from the model for finetuning llama2 embedding model
+We used,
 
-3. Train
+- 600M Malaysian Llama2, https://huggingface.co/mesolitica/llama-600m-hf-32768-fpf
+- 1B Malaysian Llama2, https://huggingface.co/mesolitica/llama-1b-hf-32768-fpf
+
+3. Train.
 
 ```
 WANDB_PROJECT=llama-7b-embedding python3 run.py \
