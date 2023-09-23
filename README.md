@@ -72,5 +72,7 @@ WANDB_PROJECT=llama-7b-embedding python3 run.py \
 --bf16
 ```
 
+## Contribution
 
-
+1. Thanks to https://github.com/aisyahrzk for preparing finetuning script and mining embedding dataset.
+2. Thanks to https://github.com/KamarulAdha for mining embedding dataset.
