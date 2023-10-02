@@ -17,6 +17,7 @@ from arguments import ModelArguments, DataArguments, \
     RetrieverTrainingArguments as TrainingArguments
 from data import TrainDatasetForEmbedding, EmbedCollator
 from modeling import LlamaModelEmbedding
+from llama_patch import replace_attn_with_flash_attn
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +81,8 @@ def main():
     
     tokenizer.pad_token = tokenizer.unk_token
     tokenizer.padding_side = "right"
+
+    replace_attn_with_flash_attn()
 
     model = LlamaModelEmbedding.from_pretrained(model_args.model_name_or_path,config = config)
 
