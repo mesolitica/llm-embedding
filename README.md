@@ -26,6 +26,11 @@ Refer notebook [mining-bge/mining-twitter.ipynb](mining-bge/mining-twitter.ipynb
 
 We published paired dataset at https://huggingface.co/datasets/mesolitica/embedding-pair-mining
 
+## Published finetuned models
+
+1. 600M, https://huggingface.co/mesolitica/llama2-embedding-600m-16k
+2. 1B, https://huggingface.co/mesolitica/llama2-embedding-1b-16k
+
 ## Finetune
 
 Finetune replicates https://github.com/FlagOpen/FlagEmbedding finetune process.
@@ -54,23 +59,23 @@ We used,
 - 600M,
 
 ```bash
-WANDB_PROJECT=llama2-embedding-600m python3 run.py \
+CUDA_VISIBLE_DEVICES=0 WANDB_PROJECT=llama2-embedding-600m python3 run.py \
 --output_dir="./embedding-model-llama-600m" \
 --model_name_or_path="mesolitica/llama-600m-hf-32768-fpf" \
---train_data="train-embedding.jsonl" \
---per_device_train_batch_size="5" \
+--train_data="shuf-train-embedding.jsonl" \
+--per_device_train_batch_size="6" \
 --learning_rate="2e-5" \
 --num_train_epochs="5" \
---max_seq_length 12288 \
---save_steps="500" \
+--max_seq_length 16384 \
+--save_steps="5000" \
 --save_total_limit="3" \
 --do_train \
 --gradient_checkpointing \
---logging_steps 20 \
+--logging_steps 1 \
 --normalized True \
 --temperature 0.02 \
---query_max_len 12288 \
---passage_max_len 12288 \
+--query_max_len 16384 \
+--passage_max_len 16384 \
 --train_group_size 3  \
 --sentence_pooling_method="mean" \
 --bf16
@@ -79,23 +84,23 @@ WANDB_PROJECT=llama2-embedding-600m python3 run.py \
 - 1B,
 
 ```bash
-WANDB_PROJECT=llama2-embedding-1b python3 run.py \
+CUDA_VISIBLE_DEVICES=1 WANDB_PROJECT=llama2-embedding-1b python3 run.py \
 --output_dir="./embedding-model-llama-1b" \
 --model_name_or_path="mesolitica/llama-1b-hf-32768-fpf" \
---train_data="train-embedding.jsonl" \
---per_device_train_batch_size="5" \
+--train_data="shuf-train-embedding.jsonl" \
+--per_device_train_batch_size="4" \
 --learning_rate="2e-5" \
 --num_train_epochs="5" \
---max_seq_length 12288 \
---save_steps="500" \
+--max_seq_length 16384 \
+--save_steps="5000" \
 --save_total_limit="3" \
 --do_train \
 --gradient_checkpointing \
---logging_steps 20 \
+--logging_steps 1 \
 --normalized True \
 --temperature 0.02 \
---query_max_len 12288 \
---passage_max_len 12288 \
+--query_max_len 16384 \
+--passage_max_len 16384 \
 --train_group_size 3  \
 --sentence_pooling_method="mean" \
 --bf16

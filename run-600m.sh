@@ -1,0 +1,20 @@
+CUDA_VISIBLE_DEVICES=0 WANDB_PROJECT=llama2-embedding-600m python3 run.py \
+--output_dir="./embedding-model-llama-600m" \
+--model_name_or_path="mesolitica/llama-600m-hf-32768-fpf" \
+--train_data="shuf-train-embedding.jsonl" \
+--per_device_train_batch_size="6" \
+--learning_rate="2e-5" \
+--num_train_epochs="5" \
+--max_seq_length 16384 \
+--save_steps="5000" \
+--save_total_limit="3" \
+--do_train \
+--gradient_checkpointing \
+--logging_steps 1 \
+--normalized True \
+--temperature 0.02 \
+--query_max_len 16384 \
+--passage_max_len 16384 \
+--train_group_size 3  \
+--sentence_pooling_method="mean" \
+--bf16
