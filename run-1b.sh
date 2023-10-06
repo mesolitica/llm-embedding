@@ -1,20 +1,23 @@
-CUDA_VISIBLE_DEVICES=1 WANDB_PROJECT=llama2-embedding-1b python3 run.py \
+WANDB_PROJECT=llama2-embedding-1b \
+~/.local/bin/deepspeed run.py \
+--deepspeed ds_config_zero3.json \
 --output_dir="./embedding-model-llama-1b" \
 --model_name_or_path="mesolitica/llama-1b-hf-32768-fpf" \
 --train_data="shuf-train-embedding.jsonl" \
---per_device_train_batch_size="4" \
+--per_device_train_batch_size="8" \
 --learning_rate="2e-5" \
---num_train_epochs="5" \
---max_seq_length 16384 \
---save_steps="5000" \
+--num_train_epochs="1" \
+--max_seq_length 8192 \
+--save_steps="300" \
 --save_total_limit="3" \
 --do_train \
 --gradient_checkpointing \
 --logging_steps 1 \
 --normalized True \
 --temperature 0.02 \
---query_max_len 16384 \
---passage_max_len 16384 \
+--query_max_len 8192 \
+--passage_max_len 8192 \
 --train_group_size 3  \
 --sentence_pooling_method="mean" \
+--max_grad_norm 0.5 \
 --bf16

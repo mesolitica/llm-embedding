@@ -28,8 +28,25 @@ We published paired dataset at https://huggingface.co/datasets/mesolitica/embedd
 
 ## Published finetuned models
 
-1. 600M, https://huggingface.co/mesolitica/llama2-embedding-600m-16k
-2. 1B, https://huggingface.co/mesolitica/llama2-embedding-1b-16k
+1. 600M, https://huggingface.co/mesolitica/llama2-embedding-600m-8k
+2. 1B, https://huggingface.co/mesolitica/llama2-embedding-1b-8k
+
+## Prerequisites
+
+1. Install libraries,
+
+```bash
+pip3 install -r requirements.txt
+```
+
+### Flash Attention 2
+
+1. Install dependencies,
+
+```bash
+pip3 install flash-attn --no-build-isolation
+pip3 install git+https://github.com/HazyResearch/flash-attention.git#subdirectory=csrc/rotary
+```
 
 ## Finetune
 
@@ -59,52 +76,16 @@ We used,
 - 600M,
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 WANDB_PROJECT=llama2-embedding-600m python3 run.py \
---output_dir="./embedding-model-llama-600m" \
---model_name_or_path="mesolitica/llama-600m-hf-32768-fpf" \
---train_data="shuf-train-embedding.jsonl" \
---per_device_train_batch_size="6" \
---learning_rate="2e-5" \
---num_train_epochs="5" \
---max_seq_length 16384 \
---save_steps="5000" \
---save_total_limit="3" \
---do_train \
---gradient_checkpointing \
---logging_steps 1 \
---normalized True \
---temperature 0.02 \
---query_max_len 16384 \
---passage_max_len 16384 \
---train_group_size 3  \
---sentence_pooling_method="mean" \
---bf16
+bash run-600m.sh
 ```
 
 - 1B,
 
 ```bash
-CUDA_VISIBLE_DEVICES=1 WANDB_PROJECT=llama2-embedding-1b python3 run.py \
---output_dir="./embedding-model-llama-1b" \
---model_name_or_path="mesolitica/llama-1b-hf-32768-fpf" \
---train_data="shuf-train-embedding.jsonl" \
---per_device_train_batch_size="4" \
---learning_rate="2e-5" \
---num_train_epochs="5" \
---max_seq_length 16384 \
---save_steps="5000" \
---save_total_limit="3" \
---do_train \
---gradient_checkpointing \
---logging_steps 1 \
---normalized True \
---temperature 0.02 \
---query_max_len 16384 \
---passage_max_len 16384 \
---train_group_size 3  \
---sentence_pooling_method="mean" \
---bf16
+bash run-1b.sh
 ```
+
+**Each trained on SPOT Standard_NC96ads_A100_v4 in AKS**.
 
 ## Contribution
 
