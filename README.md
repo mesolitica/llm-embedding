@@ -91,6 +91,14 @@ bash run-1b.sh
 
 We sampled test set, only take first 1000 rows for each test set, example, [test-set/test-sample-twitter.ipynb](test-set/test-sample-twitter.ipynb).
 
+- `positive_score`, cosine score, how good similarity score for positive class.
+- `negative_score`, 1 - cosine score, how good similarity score for negative class.
+- `top1`, top 1 accuracy classification.
+- `top3`, top 3 accuracy classification.
+- `top5`, top 5 accuracy classification.
+- `top10`, top 10 accuracy classification.
+
+
 ### OpenAI
 
 ```python
@@ -131,6 +139,43 @@ We sampled test set, only take first 1000 rows for each test set, example, [test
 ```
 
 ### Llama2 Embedding 600M
+
+```python
+{
+    'b.cari.com.my': {
+        'positive score': 0.79568475,
+        'negative score': 0.6981619672232329,
+        'top1': 0.3168440826549781,
+        'top3': 0.6881653099561679,
+        'top5': 0.7789605510331872,
+        'top10': 0.8453350031308704,
+    },
+    'c.cari.com.my': {
+        'positive score': 0.71944785,
+        'negative score': 0.7663808533028701,
+        'top1': 0.08327446132108796,
+        'top3': 0.18730130695867184,
+        'top5': 0.23975626986930412,
+        'top10': 0.3140233133168492,
+    },
+    'malay-news': {
+        'positive score': 0.71082395,
+        'negative score': 0.7160432709481884,
+        'top1': 0.14268909540054112,
+        'top3': 0.27584990001176335,
+        'top5': 0.3640748147276791,
+        'top10': 0.47112104458299026,
+    },
+    'twitter': {
+        'positive score': 0.8202477,
+        'negative score': 0.7034184992996264,
+        'top1': 0.23496782782338585,
+        'top3': 0.5200798757488352,
+        'top5': 0.6416685156423342,
+        'top10': 0.785888617705791,
+    },
+}
+```
 
 ### Llama2 Embedding 1B
 
