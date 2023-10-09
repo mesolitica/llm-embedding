@@ -87,6 +87,54 @@ bash run-1b.sh
 
 **Each trained on SPOT Standard_NC96ads_A100_v4 in AKS**.
 
+## Benchmarks
+
+We sampled test set, only take first 1000 rows for each test set, example, [test-set/test-sample-twitter.ipynb](test-set/test-sample-twitter.ipynb).
+
+### OpenAI
+
+```python
+{
+    'b.cari.com.my': {
+        'positive score': 0.8729225971201091,
+        'negative score': 0.27480777421889363,
+        'top1': 0.31621790857858484,
+        'top3': 0.6242955541640576,
+        'top5': 0.6944270507201001,
+        'top10': 0.7623669380087664,
+    },
+    'c.cari.com.my': {
+        'positive score': 0.8173745331635356,
+        'negative score': 0.3100609159718768,
+        'top1': 0.08380430943129637,
+        'top3': 0.21388202048746027,
+        'top5': 0.27861179795125396,
+        'top10': 0.3589720946661957,
+    },
+    'malay-news': {
+        'positive score': 0.8448714707337686,
+        'negative score': 0.2741472719191583,
+        'top1': 0.1386895659334196,
+        'top3': 0.2952593812492648,
+        'top5': 0.3745441712739678,
+        'top10': 0.4754734737089754,
+    },
+    'twitter': {
+        'positive score': 0.8928321128367129,
+        'negative score': 0.26488808270585834,
+        'top1': 0.22942090082094518,
+        'top3': 0.4919014865764367,
+        'top5': 0.5930774351009541,
+        'top10': 0.7248724206789439,
+    },
+}
+```
+
+### Llama2 Embedding 600M
+
+### Llama2 Embedding 1B
+
+
 ## Contribution
 
 1. Thanks to https://github.com/aisyahrzk for preparing finetuning script and mining embedding dataset.
