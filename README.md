@@ -179,6 +179,46 @@ We sampled test set, only take first 1000 rows for each test set, example, [test
 
 ### Llama2 Embedding 1B
 
+```python
+{
+    'Size (MB)': 3790,
+    'embedding size': 1536,
+    'Suggested length': 32768,
+    'b.cari.com.my': {
+        'positive score': 0.82174283,
+        'negative score': 0.7068604469821633,
+        'top1': 0.32623669380087666,
+        'top3': 0.6947401377582968,
+        'top5': 0.7902316844082655,
+        'top10': 0.8603631809643081,
+    },
+    'c.cari.com.my': {
+        'positive score': 0.74685395,
+        'negative score': 0.7647963317331168,
+        'top1': 0.08689509007417874,
+        'top3': 0.19966442953020133,
+        'top5': 0.26086188625927237,
+        'top10': 0.3430766513599435,
+    },
+    'malay-news': {
+        'positive score': 0.7159956,
+        'negative score': 0.776366058746266,
+        'top1': 0.14610045876955652,
+        'top3': 0.285260557581461,
+        'top5': 0.3640748147276791,
+        'top10': 0.4775908716621574,
+    },
+    'twitter': {
+        'positive score': 0.8326124,
+        'negative score': 0.748791925041112,
+        'top1': 0.23053028622143332,
+        'top3': 0.5342800088750832,
+        'top5': 0.6498779676059463,
+        'top10': 0.7925449301087197,
+    },
+}
+```
+
 
 ## Contribution
 
