@@ -181,9 +181,6 @@ We sampled test set, only take first 1000 rows for each test set, example, [test
 
 ```python
 {
-    'Size (MB)': 3790,
-    'embedding size': 1536,
-    'Suggested length': 32768,
     'b.cari.com.my': {
         'positive score': 0.82174283,
         'negative score': 0.7068604469821633,
