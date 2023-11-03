@@ -216,6 +216,11 @@ We sampled test set, only take first 1000 rows for each test set, example, [test
 }
 ```
 
+## Post mining
+
+We use 1B to mining back available data, scripts at [post-mining](post-mining) and published at https://huggingface.co/datasets/mesolitica/embedding-pair-mining-malaysian-llama2-1b
+
+You can use this data to train smaller models.
 
 ## Contribution
 
