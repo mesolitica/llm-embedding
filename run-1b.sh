@@ -1,9 +1,9 @@
-WANDB_PROJECT=llama2-embedding-1b \
-~/.local/bin/deepspeed run.py \
+WANDB_PROJECT=llama2-embedding-1b-v2 \
+deepspeed run.py \
 --deepspeed ds_config_zero3.json \
 --output_dir="./embedding-model-llama-1b" \
 --model_name_or_path="mesolitica/llama-1b-hf-32768-fpf" \
---train_data="shuf-train-embedding.jsonl" \
+--train_data="dataset" \
 --per_device_train_batch_size="8" \
 --learning_rate="2e-5" \
 --num_train_epochs="1" \
