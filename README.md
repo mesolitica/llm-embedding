@@ -1,6 +1,6 @@
-# llama2-embedding
+# LLM-embedding
 
-Finetune Malaysian Llama2 for Malaysian context embedding task.
+Finetune Malaysian LLM for Malaysian context embedding task.
 
 ## Dataset Preparation
 
