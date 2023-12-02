@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
 
-from transformers import AutoConfig, AutoTokenizer, AutoModel
+from transformers import AutoConfig, AutoTokenizer, AutoModel, MistralConfig
 from transformers import (
     HfArgumentParser,
     set_seed,
@@ -16,6 +16,9 @@ from arguments import ModelArguments, DataArguments, \
     RetrieverTrainingArguments as TrainingArguments
 from data_contrastive import TrainDatasetForEmbedding, EmbedCollator
 from mistral_contrastive import MistralModelEmbedding
+import torch
+
+logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +68,7 @@ def main():
         cache_dir=model_args.cache_dir,
         use_fast=False,
     )
-    config = LlamaConfig.from_pretrained(
+    config = MistralConfig.from_pretrained(
         model_args.config_name if model_args.config_name else model_args.model_name_or_path,
         num_labels=num_labels,
         cache_dir=model_args.cache_dir,
@@ -77,13 +80,13 @@ def main():
 
     logger.info('Config: %s', config)
     
-    tokenizer.pad_token = tokenizer.unk_token
     tokenizer.padding_side = "right"
 
-    model = LlamaModelEmbedding.from_pretrained(
+    model = MistralModelEmbedding.from_pretrained(
         model_args.model_name_or_path,
         config = config,
-        use_flash_attention_2 = True
+        use_flash_attention_2 = True,
+        torch_dtype=torch.bfloat16,
     )
 
     if training_args.fix_position_embedding:

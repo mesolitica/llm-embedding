@@ -22,7 +22,7 @@ class MistralModelEmbedding(MistralModel):
     def __init__(self, config: MistralConfig, **kwargs):
         super().__init__(config, **kwargs)
 
-        self.dense_layer = nn.Linear(self.config.hidden_size,1536)
+        self.dense_layer = nn.Linear(self.config.hidden_size,768)
         
     def sentence_embedding(self, hidden_state, mask):
         if self.config.sentence_pooling_method == 'mean':
