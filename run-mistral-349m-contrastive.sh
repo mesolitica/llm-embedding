@@ -1,8 +1,8 @@
-WANDB_PROJECT=mistral-embedding-191m-contrastive \
+WANDB_PROJECT=mistral-embedding-349m-contrastive \
 torchrun --nproc_per_node 4 \
 -m run_mistral_contrastive \
---output_dir="./embedding-model-mistral-191m-contrastive" \
---model_name_or_path="mesolitica/malaysian-mistral-191M-4096" \
+--output_dir="./embedding-model-mistral-349m-contrastive" \
+--model_name_or_path="mesolitica/malaysian-mistral-349M-4096" \
 --train_data="/home/ubuntu/mosaic-embedding-pairs" \
 --per_device_train_batch_size="2" \
 --gradient_accumulation_steps 4 \
