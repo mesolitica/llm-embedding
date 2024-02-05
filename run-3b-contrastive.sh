@@ -1,15 +1,15 @@
-WANDB_PROJECT=llama2-embedding-600m-contrastive \
+WANDB_PROJECT=llama2-embedding-3b-contrastive \
 deepspeed run_contrastive.py \
 --deepspeed ds_config_zero3.json \
---output_dir="./embedding-model-llama-600m-contrastive" \
---model_name_or_path="mesolitica/llama-600m-hf-32768-fpf" \
+--output_dir="./embedding-model-llama-3b-contrastive" \
+--model_name_or_path="huseinzol05/llama-3.2b-hf-32768" \
 --train_data="/home/ubuntu/mosaic-embedding-pairs" \
---per_device_train_batch_size="4" \
---gradient_accumulation_steps 2 \
+--per_device_train_batch_size="2" \
+--gradient_accumulation_steps 5 \
 --learning_rate="2e-5" \
 --num_train_epochs="4" \
 --max_seq_length 8192 \
---save_steps="300" \
+--save_steps="200" \
 --save_total_limit="3" \
 --do_train \
 --gradient_checkpointing \
@@ -20,5 +20,5 @@ deepspeed run_contrastive.py \
 --passage_max_len 8192 \
 --train_group_size 3  \
 --sentence_pooling_method="mean" \
---max_grad_norm 0.5 \
+--max_grad_norm 1.0 \
 --bf16
