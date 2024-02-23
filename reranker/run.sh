@@ -1,0 +1,16 @@
+python3 reranker_bge_m3_faiq/run.py \
+--output_dir="reranker_bge_m3_faiq/reranker-bge-m3" \
+--model_name_or_path="BAAI/bge-m3" \
+--train_data="reranker-mosaic-dataset/mosaic-dataset-all" \
+--max_seq_length 10240 \
+--per_device_train_batch_size="36" \
+--learning_rate="2e-5" \
+--num_train_epochs="2" \
+--save_steps="100" \
+--save_total_limit="3" \
+--do_train \
+--gradient_checkpointing \
+--logging_steps 1 \
+--max_grad_norm 0.5 \
+--overwrite_output_dir \
+--bf16
