@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 from transformers import AutoConfig, AutoTokenizer, \
-                         TrainingArguments, Trainer, XLMRobertaForSequenceClassification
+                         TrainingArguments, Trainer, MistralForSequenceClassification
 from transformers import (
     HfArgumentParser,
     set_seed,
@@ -25,6 +25,7 @@ def main():
     model_args: ModelArguments
     data_args: DataArguments
     training_args: TrainingArguments
+    # print(training_args)
 
     if (
             os.path.exists(training_args.output_dir)
@@ -81,10 +82,11 @@ def main():
     )
 
 
-    model = XLMRobertaForSequenceClassification.from_pretrained(
+    model = MistralForSequenceClassification.from_pretrained(
         model_args.model_name_or_path,
         config=config,
         cache_dir=model_args.cache_dir,
+        use_flash_attention_2=True
     )
 
     train_dataset = DatasetFixed(data_args.train_data, tokenizer, data_args.max_seq_length)
