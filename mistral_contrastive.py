@@ -1,5 +1,5 @@
 
-from transformers import MistralModel, MistralConfig
+from transformers import MistralPreTrainedModel, MistralModel, MistralConfig
 from typing import Dict
 from transformers.file_utils import ModelOutput
 from typing import List, Optional, Tuple, Union
@@ -7,7 +7,6 @@ from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 from torch import nn, Tensor
 from dataclasses import dataclass
 from torch import nn
-from typing import Dict
 import torch
 from transformers.file_utils import ModelOutput
 import torch.nn.functional as F
@@ -18,21 +17,23 @@ COSINE_DISTANCE = lambda x, y: 1-F.cosine_similarity(x, y)
 class EncoderOutput(ModelOutput):
     loss: Optional[Tensor] = None
 
-class MistralModelEmbedding(MistralModel):
-    def __init__(self, config: MistralConfig, **kwargs):
+class MistralModelEmbedding(MistralPreTrainedModel):
+    def __init__(self, config, **kwargs):
         super().__init__(config, **kwargs)
 
+        self.model = MistralModel(config)
         self.dense_layer = nn.Linear(
             self.config.hidden_size,
             self.config.embedding_size,
             bias=False
         )
+        self.post_init()
     
 
     def encode(self, features):
         if features is None:
             return None
-        psg_out = super().forward(**features,return_dict=True)
+        psg_out = self.model.forward(**features,return_dict=True)
         logits = self.dense_layer(psg_out.last_hidden_state)
         input_ids = features['input_ids']
         batch_size = input_ids.shape[0]
