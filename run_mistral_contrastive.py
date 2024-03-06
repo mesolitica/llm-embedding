@@ -22,6 +22,61 @@ logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
+@dataclass
+class ModelArguments:
+    """
+    Arguments pertaining to which model/config/tokenizer we are going to fine-tune from.
+    """
+
+    model_name_or_path: str = field(
+        metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
+    )
+    config_name: Optional[str] = field(
+        default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
+    )
+    tokenizer_name: Optional[str] = field(
+        default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
+    )
+    cache_dir: Optional[str] = field(
+        default=None, metadata={"help": "Where do you want to store the pretrained models downloaded from s3"}
+    )
+
+    sentence_pooling_method: str = field(default='cls', metadata={"help": "the pooling method, should be cls or mean"})
+    
+
+
+@dataclass
+class DataArguments:
+    train_data: str = field(
+        default=None, metadata={"help": "Path to train data"}
+    )
+
+    query_max_len: int = field(
+        default=32,
+        metadata={
+            "help": "The maximum total input sequence length after tokenization for passage. Sequences longer "
+                    "than this will be truncated, sequences shorter will be padded."
+        },
+    )
+
+    passage_max_len: int = field(
+        default=128,
+        metadata={
+            "help": "The maximum total input sequence length after tokenization for passage. Sequences longer "
+                    "than this will be truncated, sequences shorter will be padded."
+        },
+    )
+
+    query_instruction_for_retrieval: str= field(
+        default=None, metadata={"help": "instruction for query"}
+    )
+    passage_instruction_for_retrieval: str = field(
+        default=None, metadata={"help": "instruction for passage"}
+    )
+
+    def __post_init__(self):
+        if not os.path.exists(self.train_data):
+            raise FileNotFoundError(f"cannot find file: {self.train_data}, please set a true path")
 
 def main():
 
@@ -62,7 +117,6 @@ def main():
     # Set seed
     set_seed(training_args.seed)
 
-    num_labels = 1
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
@@ -70,15 +124,13 @@ def main():
     )
     config = MistralConfig.from_pretrained(
         model_args.config_name if model_args.config_name else model_args.model_name_or_path,
-        num_labels=num_labels,
         cache_dir=model_args.cache_dir,
     )
 
-    config.temperature = training_args.temperature
-    config.normalized = model_args.normalized
     config.sentence_pooling_method = model_args.sentence_pooling_method
+    config.embedding_size = model_args.embedding_size
 
-    logger.info('Config: %s', config)
+    logger.info(config)
     
     tokenizer.padding_side = "right"
 
@@ -89,14 +141,7 @@ def main():
         torch_dtype=torch.bfloat16,
     )
 
-    if training_args.fix_position_embedding:
-        for k, v in model.named_parameters():
-            if "position_embeddings" in k:
-                logging.info(f"Freeze the parameters for {k}")
-                v.requires_grad = False
-
     train_dataset = TrainDatasetForEmbedding(args=data_args, tokenizer=tokenizer)
-
 
     trainer = Trainer(
         model=model,

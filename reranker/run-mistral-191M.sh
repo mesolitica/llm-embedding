@@ -1,0 +1,17 @@
+WANDB_PROJECT=reranker-malaysian-mistral-191M-32768 ~/.local/bin/deepspeed run.py \
+--deepspeed ds_config_zero3.json \
+--output_dir="reranker-malaysian-mistral-191M" \
+--model_name_or_path="mesolitica/malaysian-mistral-191M-4096" \
+--train_data="/home/ubuntu/mosaic-dataset-resampled-7m-train-split" \
+--max_seq_length 32768 \
+--per_device_train_batch_size="32" \
+--learning_rate="2e-5" \
+--num_train_epochs="2" \
+--save_steps="200" \
+--save_total_limit="3" \
+--do_train \
+--gradient_checkpointing \
+--logging_steps 1 \
+--max_grad_norm 1 \
+--overwrite_output_dir \
+--bf16

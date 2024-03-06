@@ -22,25 +22,25 @@ class MistralModelEmbedding(MistralModel):
     def __init__(self, config: MistralConfig, **kwargs):
         super().__init__(config, **kwargs)
 
-        self.dense_layer = nn.Linear(self.config.hidden_size,768)
-        
-    def sentence_embedding(self, hidden_state, mask):
-        if self.config.sentence_pooling_method == 'mean':
-            s = torch.sum(hidden_state * mask.unsqueeze(-1).float(), dim=1)
-            d = mask.sum(axis=1, keepdim=True).float()
-            return s / d
-        elif self.config.sentence_pooling_method == 'cls':
-            return hidden_state[:,0]
+        self.dense_layer = nn.Linear(
+            self.config.hidden_size,
+            self.config.embedding_size,
+            bias=False
+        )
+    
 
     def encode(self, features):
         if features is None:
             return None
         psg_out = super().forward(**features,return_dict=True)
-        output = self.dense_layer(psg_out.last_hidden_state)
-        p_reps = self.sentence_embedding(output, features['attention_mask'])
-        if self.config.normalized:
-            p_reps = torch.nn.functional.normalize(p_reps, dim=-1)
-        return p_reps.contiguous()
+        logits = self.dense_layer(psg_out.last_hidden_state)
+        input_ids = features['input_ids']
+        batch_size = input_ids.shape[0]
+        sequence_lengths = torch.eq(input_ids, self.config.pad_token_id).int().argmax(-1) - 1
+        sequence_lengths = sequence_lengths % input_ids.shape[-1]
+        sequence_lengths = sequence_lengths.to(logits.device)
+        pooled_logits = logits[torch.arange(batch_size, device=logits.device), sequence_lengths]
+        return pooled_logits
 
 
     def forward(self, query: Dict[str, Tensor] = None,
@@ -57,4 +57,3 @@ class MistralModelEmbedding(MistralModel):
         return EncoderOutput(
             loss=loss,
         )
-

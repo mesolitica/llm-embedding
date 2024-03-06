@@ -1,6 +1,5 @@
-WANDB_PROJECT=mistral-embedding-191m-contrastive \
-torchrun --nproc_per_node 4 \
--m run_mistral_contrastive \
+WANDB_PROJECT=embedding-malaysian-mistral-191M-32768 ~/.local/bin/deepspeed run.py \
+--deepspeed ds_config_zero3.json \
 --output_dir="./embedding-model-mistral-191m-contrastive" \
 --model_name_or_path="mesolitica/malaysian-mistral-191M-4096" \
 --train_data="/home/ubuntu/mosaic-embedding-pairs" \
@@ -13,12 +12,9 @@ torchrun --nproc_per_node 4 \
 --save_total_limit="3" \
 --do_train \
 --logging_steps 1 \
---normalized True \
---temperature 0.02 \
 --query_max_len 8192 \
 --passage_max_len 8192 \
---train_group_size 3  \
---sentence_pooling_method="mean" \
---max_grad_norm 0.5 \
+--sentence_pooling_method="cls" \
+--max_grad_norm 1.0 \
 --log_level="debug" \
 --bf16
