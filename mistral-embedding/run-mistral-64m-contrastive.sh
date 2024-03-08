@@ -1,0 +1,22 @@
+WANDB_PROJECT=embedding-malaysian-mistral-64M-32768 \
+~/.local/bin/deepspeed run_mistral_contrastive.py \
+--deepspeed ds_config_zero3.json \
+--output_dir="./embedding-model-mistral-64m-contrastive" \
+--model_name_or_path="mesolitica/malaysian-mistral-64M-4096" \
+--train_data="/home/ubuntu/mosaic-embedding-pairs-v2" \
+--per_device_train_batch_size="32" \
+--gradient_accumulation_steps 2 \
+--learning_rate="2e-5" \
+--num_train_epochs="2" \
+--embedding_size 768 \
+--save_steps="50" \
+--save_total_limit="3" \
+--do_train \
+--logging_steps 1 \
+--query_max_len 20480 \
+--passage_max_len 20480 \
+--max_grad_norm 1.0 \
+--log_level="debug" \
+--bf16 \
+--train_group_size 2 \
+--gradient_checkpointing

@@ -1,22 +1,26 @@
 import logging
 import os
+import random
+import math
+from dataclasses import dataclass, field
 from pathlib import Path
+from transformers import DataCollatorWithPadding
 from transformers.trainer_utils import get_last_checkpoint, is_main_process
-
 from transformers import AutoConfig, AutoTokenizer, AutoModel, MistralConfig
 from transformers import (
     HfArgumentParser,
     set_seed,
 )
-
+from typing import Optional, Dict
 from transformers import TrainingArguments
 from transformers.trainer import Trainer
-
-from arguments import ModelArguments, DataArguments, \
-    RetrieverTrainingArguments as TrainingArguments
-from data_contrastive import TrainDatasetForEmbedding, EmbedCollator
 from mistral_contrastive import MistralModelEmbedding
+from torch.utils.data import Dataset
+from streaming import LocalDataset
+from streaming.base.format.mds.encodings import Encoding, _encodings
+from sklearn.utils import shuffle
 import torch
+import json
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -31,6 +35,9 @@ class ModelArguments:
     model_name_or_path: str = field(
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"}
     )
+    embedding_size: int = field(
+        metadata={"help": "embedding size"}
+    )
     config_name: Optional[str] = field(
         default=None, metadata={"help": "Pretrained config name or path if not the same as model_name"}
     )
@@ -40,8 +47,6 @@ class ModelArguments:
     cache_dir: Optional[str] = field(
         default=None, metadata={"help": "Where do you want to store the pretrained models downloaded from s3"}
     )
-
-    sentence_pooling_method: str = field(default='cls', metadata={"help": "the pooling method, should be cls or mean"})
     
 
 
@@ -74,9 +79,91 @@ class DataArguments:
         default=None, metadata={"help": "instruction for passage"}
     )
 
-    def __post_init__(self):
-        if not os.path.exists(self.train_data):
-            raise FileNotFoundError(f"cannot find file: {self.train_data}, please set a true path")
+    train_group_size: int = field(
+        default=3,
+        metadata={
+            "help": "max group size"
+        },
+    )
+
+
+class ListStr(Encoding):
+    def encode(self, obj):
+        return json.dumps(obj).encode()
+
+    def decode(self, data):
+        return json.loads(data)
+
+_encodings['liststr'] = ListStr
+
+class TrainDatasetForEmbedding(Dataset):
+    def __init__(self, args, tokenizer):
+        self.dataset = LocalDataset(local = args.train_data)
+        self.tokenizer = tokenizer
+        self.args = args
+        self.total_len = len(self.dataset)
+
+    def __len__(self):
+        return self.total_len
+
+    def __getitem__(self, item):
+        query = self.dataset[item]['query']
+        if self.args.query_instruction_for_retrieval is not None:
+            query = self.args.query_instruction_for_retrieval + query
+
+        if len(self.dataset[item]['pos']) < self.args.train_group_size:
+            poss = self.dataset[item]['pos']
+        else:
+            poss = random.sample(self.dataset[item]['pos'], self.args.train_group_size)
+
+        if len(self.dataset[item]['neg']) < self.args.train_group_size:
+            negs = self.dataset[item]['neg']
+        else:
+            negs = random.sample(self.dataset[item]['neg'], self.args.train_group_size)
+
+        combine = poss + negs
+        labels = [1] * len(poss) + [0] * len(negs)
+
+        combine, labels = shuffle(combine, labels)
+
+        return [query] * len(combine), combine, labels
+
+
+@dataclass
+class EmbedCollator(DataCollatorWithPadding):
+
+    query_max_len: int = 32
+    passage_max_len: int = 128
+
+    def __call__(self, features):
+        query = [f[0] for f in features]
+        passage = [f[1] for f in features]
+        label = [f[2] for f in features]
+
+        if isinstance(query[0], list):
+            query = sum(query, [])
+        if isinstance(passage[0], list):
+            passage = sum(passage, [])
+        if isinstance(label[0], list):
+            label = sum(label, [])
+
+        q_collated = self.tokenizer(
+            query,
+            padding=True,
+            truncation=True,
+            max_length=self.query_max_len,
+            return_tensors="pt",
+        )
+        q_collated.pop('token_type_ids')
+        d_collated = self.tokenizer(
+            passage,
+            padding=True,
+            truncation=True,
+            max_length=self.passage_max_len,
+            return_tensors="pt",
+        )
+        d_collated.pop('token_type_ids')
+        return {"query": q_collated, "passage": d_collated, "labels": torch.tensor(label)}
 
 def main():
 
@@ -127,12 +214,11 @@ def main():
         cache_dir=model_args.cache_dir,
     )
 
-    config.sentence_pooling_method = model_args.sentence_pooling_method
     config.embedding_size = model_args.embedding_size
 
     logger.info(config)
     
-    tokenizer.padding_side = "right"
+    # tokenizer.padding_side = "left"
 
     model = MistralModelEmbedding.from_pretrained(
         model_args.model_name_or_path,
@@ -163,13 +249,7 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
 
-        try:
-            train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        except Exception as e:
-            e = str(e)
-            print(e)
-            if checkpoint and 'checkpoint' in e:
-                os.system(f'mv {checkpoint} {checkpoint}-temp')
+        train_result = trainer.train(resume_from_checkpoint=checkpoint)
 
     
 
